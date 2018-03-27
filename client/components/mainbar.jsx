@@ -5,8 +5,10 @@ import classNames from 'classnames'
 import Toolbar from 'material-ui/Toolbar'
 import IconButton from 'material-ui/IconButton'
 import Divider from 'material-ui/Divider'
-import List from 'material-ui/List'
+import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 import MenuIcon from 'material-ui-icons/Menu'
+import InboxIcon from 'material-ui-icons/Inbox';
+import DraftsIcon from 'material-ui-icons/Drafts';
 import ChevronLeftIcon from 'material-ui-icons/ChevronLeft'
 import ChevronRightIcon from 'material-ui-icons/ChevronRight'
 import {withStyles} from 'material-ui/styles'
@@ -53,7 +55,7 @@ const styles = theme => ({
     display: 'none',
   },
   drawer_paper: {
-    position: 'relative',
+    position: 'fixed',
     width: drawerWidth,
   },
   drawer_header: {
@@ -92,6 +94,50 @@ const styles = theme => ({
   }
 })
 
+class App_Drawer extends React.Component {
+	constructor () {
+		super()
+	}
+
+	render () {
+		const {classes, theme} = this.props
+		console.log(this.props)
+		return (
+			<Drawer
+			  anchor="left"
+			  onClose={this.props.toggleDrawerOpen}
+			  open={this.props.drawer_open}
+			  classes={{
+				  paper: classes.drawer_paper,
+			  }}
+			  >
+			  <div className={classes.drawer_header}>
+				<IconButton onClick={this.props.toggleDrawerOpen}>
+				  {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+				</IconButton>
+			  </div>
+			  <List component="nav">
+				<ListItem button>
+				  <ListItemIcon>
+					<InboxIcon />
+				  </ListItemIcon>
+				  <ListItemText primary="Inbox" />
+				</ListItem>
+				<ListItem button>
+				  <ListItemIcon>
+					<DraftsIcon />
+				  </ListItemIcon>
+				  <ListItemText primary="Drafts" />
+				</ListItem>
+			  </List>
+			  <Divider />
+			  <Divider />
+			</Drawer>
+		)
+	}
+}
+var AppDrawer = withStyles(styles, {withTheme: true})(App_Drawer)
+
 class MainBar extends React.Component {
 	constructor () {
 		super()
@@ -103,33 +149,19 @@ class MainBar extends React.Component {
 	}
 	render () {
 		const {classes, theme} = this.props
-		const drawer = (
-		<Drawer
-          variant="persistent"
-          anchor="left"
-          open={this.state.drawer_open}
-          classes={{
-			  paper: classes.drawer_paper,
-          }}
-		  >
-          <div className={classes.drawer_header}>
-			<IconButton onClick={this.handleDrawerClose}>
-              {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-			</IconButton>
-          </div>
-          <Divider />
-          <Divider />
-		</Drawer>
-    )
-		return (<AppBar className={classes.app_bar} position="static"><Toolbar disableGutters={!this.state.drawer_open}><IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={this.toggleDrawerOpen}
-                className={classNames(classes.menu_button, this.state.drawer_open && classes.hide)}
-				>
-                <MenuIcon />
-				</IconButton>
-				</Toolbar></AppBar>)
+		return (<AppBar className={classes.app_bar} position="static">
+					<Toolbar disableGutters={!this.state.drawer_open}>
+						<IconButton
+						color="inherit"
+						aria-label="open drawer"
+						onClick={this.toggleDrawerOpen}
+						className={classNames(classes.menu_button, this.state.drawer_open && classes.hide)}
+						>
+							<MenuIcon />
+						</IconButton>
+					</Toolbar>
+					<AppDrawer drawer_open={this.state.drawer_open} toggleDrawerOpen={this.toggleDrawerOpen} classes={classes}/>
+				</AppBar>)
 	}
 }
 export default withStyles(styles, { withTheme: true })(MainBar);
